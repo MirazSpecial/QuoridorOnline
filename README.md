@@ -1,5 +1,3 @@
-Quoridor Online
-
 Quoridor board game for two players two be played over wifi.
 Written in python using sockets and pygame. 
 
