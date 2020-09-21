@@ -15,7 +15,6 @@ class Board:
     HIGHLIGHTED_BLOCK_COLOR = 151,151,151,255
     END_TEXT_COLOR = 128,128,128,255
     INFO_BOX_SIZE = 50
-    INFO_TEXT_COLOR = 129,14,122,255
     INFO_TEXT_SIZE = 30
     BUTTON_TEXT_SIZE = 45
     BUTTON_WIDTH = 100 
@@ -162,10 +161,10 @@ class Board:
         text_right_1 = f"Player 2 distance to endline: {game.check_dist(1, 0)} "
         text_right_2 = f"Player 2 remaining blocks: {game.blocks_left[1]} "
         
-        text_left_1_renderd = font.render(text_left_1, 1, Board.INFO_TEXT_COLOR)
-        text_left_2_renderd = font.render(text_left_2, 1, Board.INFO_TEXT_COLOR)
-        text_right_1_renderd = font.render(text_right_1, 1, Board.INFO_TEXT_COLOR)
-        text_right_2_renderd = font.render(text_right_2, 1, Board.INFO_TEXT_COLOR)
+        text_left_1_renderd = font.render(text_left_1, 1, Board.PLAYER1_COLOR)
+        text_left_2_renderd = font.render(text_left_2, 1, Board.PLAYER1_COLOR)
+        text_right_1_renderd = font.render(text_right_1, 1, Board.PLAYER2_COLOR)
+        text_right_2_renderd = font.render(text_right_2, 1, Board.PLAYER2_COLOR)
 
         self.win.blit(text_left_1_renderd, (0, self.height))
         self.win.blit(text_left_2_renderd, (0, self.height + font.size(text_left_1)[1]))
@@ -179,7 +178,7 @@ class Board:
         text_renderd = font.render(text, 1, Board.END_TEXT_COLOR)
         self.win.blit(text_renderd, (self.width // 2 - font.size(text)[0] // 2, self.height // 2))
         pygame.display.update()
-        
+
 
     def show_winner(self, game):
         font = pygame.font.SysFont("comicsans", 80)
