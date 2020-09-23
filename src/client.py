@@ -20,7 +20,7 @@ def main():
 
         run = True      
         while run:
-            time.sleep(0.1)
+            time.sleep(0.01)
 
             game = net.send_recv_info("null", (0, 0))
             if type(game) != Game:
