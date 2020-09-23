@@ -1,5 +1,6 @@
 import pygame
 import sys
+import time
 from network import Network
 from game import Game
 from board import Board
@@ -19,6 +20,8 @@ def main():
 
         run = True      
         while run:
+            time.sleep(0.1)
+
             game = net.send_recv_info("null", (0, 0))
             if type(game) != Game:
                 run = False
