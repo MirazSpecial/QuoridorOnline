@@ -4,18 +4,6 @@ from network import Network
 from game import Game
 from board import Board
 
-def wait_for_game(net, board, pos_type = "null", pos = (0, 0)):
-    game = net.send_recv_info(pos_type, pos)
-    while type(game) != Game:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                print("[QUITTING]")
-                run = False
-                pygame.quit()
-        board.show_waiting(game)
-        game = net.send_recv_info(pos_type, pos)
-    return game
-
 def main():
     ip = sys.argv[1]
     port = int(sys.argv[2])
@@ -31,7 +19,10 @@ def main():
 
         run = True      
         while run:
-            game = wait_for_game(net, board)
+            game = net.send_recv_info("null", (0, 0))
+            if type(game) != Game:
+                run = False
+                break
 
             mouse_pos = pygame.mouse.get_pos()
             pos_type, pos = board.check_mouse_pos(game, mouse_pos)
@@ -57,7 +48,10 @@ def main():
                     pos_type, pos = board.check_mouse_pos(game, mouse_pos)
                     if board.undo_button.click(mouse_pos):
                         pos_type = "undo"
-                    game = wait_for_game(net, board, pos_type, pos)
+                    game = net.send_recv_info(pos_type, pos)
+                    if type(game) != Game:
+                        run = False
+                        break
 
 
 main()

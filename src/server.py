@@ -4,10 +4,11 @@ import sys
 import json
 from game import Game
 import pickle
+import time
 
 FORMAT = "utf-8"
 
-def handle_client(conn, game, player):
+def handle_client(conn, game, player, activePlayers):
     run = True
     try:
         conn.send(str(player).encode(FORMAT))
@@ -55,6 +56,7 @@ def handle_client(conn, game, player):
 
     print("Connection lost")
     conn.close()
+    activePlayers[player] = False
 
 
 def bind(s, server, port):
@@ -65,6 +67,14 @@ def bind(s, server, port):
     except socket.error as e:
         str(e)
 
+
+def free(tab):
+    for i in range(len(tab)):
+        if not tab[i]:
+            return i
+    return -1
+
+
 def main():
     server = sys.argv[1]
     port = int(sys.argv[2])
@@ -73,17 +83,23 @@ def main():
     bind(s, server, port)
     s.listen()
     
-    current_player = 0
+    freeSpot = 0
+    activePlayers = [False, False]
     game = Game()
 
-    while current_player < 2:
-        conn, addr = s.accept()
-        print(f"[CONNECTED] Connected to: {addr}")
+    while True:
+        freeSpot = free(activePlayers)
+        if freeSpot == -1:
+            time.sleep(1)
+            continue
+        else:
+            activePlayers[freeSpot] = True
 
-        thread = threading.Thread(target=handle_client, args=(conn, game, current_player))
-        thread.start()
+            conn, addr = s.accept()
+            print(f"[CONNECTED] Connected to: {addr}")
 
-        current_player += 1
+            thread = threading.Thread(target=handle_client, args=(conn, game, freeSpot, activePlayers))
+            thread.start()
 
 
 main()
