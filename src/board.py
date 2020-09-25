@@ -20,7 +20,7 @@ class Board:
     BUTTON_WIDTH = 100 
     BUTTON_HEIGHT = 40
 
-    def __init__(self, width, height, prec = 8):
+    def __init__(self, width = 864, height = 864, prec = 8):
         self.width = width
         self.height = height
         self.prec = prec # Field would be (prec - 2) / prec size of grid size
@@ -66,10 +66,10 @@ class Board:
         # Drawing highlighted spot
         if "highlight" in game.__dict__:
             h_type, h_pos = game.highlight
-            if h_type == "move" and game.check_step(game.players_pos[player], h_pos):
+            if h_type == "move" and game.check_move(player, h_pos):
                 field_pos = self.grid_width * h_pos[0] + self.prec_grid_width, self.grid_height * h_pos[1] + self.prec_grid_height
                 pygame.draw.rect(self.win, Board.HIGHLIGHTED_FIELD_COLOR, field_pos + self.field_size)
-            elif h_type == "vert":
+            elif h_type == "vert" and game.blocks_left[player] > 0:
                 if game.check_block("vert", h_pos):
                     block_pos = self.grid_width * (h_pos[0] + 1) - self.prec_grid_width, self.grid_height * h_pos[1] + self.prec_grid_height
                     block_size = 2 * self.prec_grid_width, 2 * self.grid_height - 2 * self.prec_grid_height
@@ -78,7 +78,7 @@ class Board:
                     block_pos = self.grid_width * (h_pos[0] + 1) - self.prec_grid_width, self.grid_height * (h_pos[1] - 1) + self.prec_grid_height
                     block_size = 2 * self.prec_grid_width, 2 * self.grid_height - 2 * self.prec_grid_height
                     pygame.draw.rect(self.win, Board.HIGHLIGHTED_BLOCK_COLOR, block_pos + block_size)     
-            elif h_type == "horiz":
+            elif h_type == "horiz" and game.blocks_left[player] > 0:
                 if game.check_block("horiz", h_pos):
                     block_pos = self.grid_width * h_pos[0] + self.prec_grid_width, self.grid_height * (h_pos[1] + 1) - self.prec_grid_height
                     block_size = 2 * self.grid_width - 2 * self.prec_grid_width, 2 * self.prec_grid_height

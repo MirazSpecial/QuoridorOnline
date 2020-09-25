@@ -45,21 +45,32 @@ class Game:
         return True
 
 
-    def move_if_possible(self, player, pos):
+    def check_move(self, player, pos):
+        """ Checks if player can move to given position at this moment. """
+        
         if self.move % 2 != player:
             return False # Not this players turn
 
         second_player_pos = self.players_pos[(player + 1) % 2]
-        if second_player_pos == (pos[0], pos[1]):
+        if second_player_pos == pos:
             return False # Another player is standing there
+
         if self.check_step(self.players_pos[player], pos):
-            self.players_pos[player] = pos[0], pos[1]
-            self.move += 1
             return True # Move was correct
-        if self.check_step(self.players_pos[player], second_player_pos) and self.check_step(second_player_pos, pos):
-            self.players_pos[player] = pos[0], pos[1]
-            self.move += 1
+        
+        if self.check_step(self.players_pos[player], second_player_pos) and \
+           self.check_step(second_player_pos, pos):
             return True # Jumped over second player
+
+        return False # Move was not possible
+
+    def move_if_possible(self, player, pos):
+        if self.check_move(player, pos):
+            move_dict = {"id": "move", "pos": pos, "old_pos": self.players_pos[player]}
+            self.moves.append(move_dict)
+            self.players_pos[player] = pos
+            self.move += 1
+            return True
         return False
 
 
@@ -104,13 +115,13 @@ class Game:
     def check_block(self, block_type, pos):
         """ Checks if placing block is possible, neglecting players turn.
         Used also in highlighting """
-
+        
         if pos[0] < 0 or pos[0] >= self.width - 1 or pos[1] < 0 or pos[1] >= self.height - 1:
             return False # Position outside of the board
-
+    
         if self.blocks[pos] != "null":
             return False # Block already at this position
-
+    
         if block_type == "vert":
             if pos[1] > 0 and self.blocks[(pos[0], pos[1] - 1)] == "vert":
                 return False # Block at upper half
@@ -133,19 +144,17 @@ class Game:
     def place_block(self, player, block_type, pos):
         if player == self.move % 2 and self.blocks_left[player] > 0:
             if self.check_block(block_type, pos):
+                block_dict = {"id": block_type, "pos": pos}
+                self.moves.append(block_dict)
                 self.blocks[pos] = block_type
                 self.blocks_left[player] -= 1
                 self.move += 1
                 return True
-            elif block_type == "vert" and self.check_block(block_type, (pos[0], pos[1] - 1)):
-                self.blocks[pos[0], pos[1] - 1] = block_type
-                self.blocks_left[player] -= 1
-                self.move += 1
+            elif block_type == "vert" and \
+                 self.place_block(player, block_type, (pos[0], pos[1] - 1)):
                 return True
-            elif block_type == "horiz" and self.check_block(block_type, (pos[0] - 1, pos[1])):
-                self.blocks[pos[0] - 1, pos[1]] = block_type
-                self.blocks_left[player] -= 1
-                self.move += 1
+            elif block_type == "horiz" and \
+                 self.place_block(player, block_type, (pos[0] - 1, pos[1])):
                 return True
         return False
 
@@ -161,10 +170,9 @@ class Game:
         if last_move["id"] == "move":
             self.players_pos[self.move % 2] = last_move["old_pos"]
         elif last_move["id"] in ("vert", "horiz"):
-            print(f"Block at {last_move['pos']} removed")
             self.blocks[tuple(last_move["pos"])] = "null"
             self.blocks_left[self.move % 2] += 1
-
+        
 
 
     def check_winner(self, player):
