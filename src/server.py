@@ -67,13 +67,13 @@ def handle_game(connection, arena, player):
 
 def handle_connection(connection, arena, new_id):
     client_id = connection.recv(DATA_RECV_SIZE).decode(FORMAT)
-    client_id = client_id.rstrip()
     client_dict = {}
 
     if not client_id:
         print("Connection not established")
         return
 
+    client_id = client_id.rstrip()
     if client_id == "null":
         print(f"Setting new id: {new_id}")
         client_dict["id"] = str(new_id)
@@ -128,4 +128,6 @@ def main():
 
         new_id += 1
 
-main()
+
+if __name__ == "__main__":
+    main()
