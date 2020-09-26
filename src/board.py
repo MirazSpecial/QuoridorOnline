@@ -156,10 +156,10 @@ class Board:
         pygame.draw.rect(self.win, Board.FIELDS_COLOR, (0, self.height, self.width, Board.INFO_BOX_SIZE))
 
         font = pygame.font.SysFont("comicsans", Board.INFO_TEXT_SIZE)
-        text_left_1 = f" Player 1 distance to endline: {game.check_dist(0, game.height - 1)}"
-        text_left_2 = f" Player 1 remaining blocks: {game.blocks_left[0]}"
-        text_right_1 = f"Player 2 distance to endline: {game.check_dist(1, 0)} "
-        text_right_2 = f"Player 2 remaining blocks: {game.blocks_left[1]} "
+        text_left_1 = f" Distance to endline: {game.check_dist(0, game.height - 1)}"
+        text_left_2 = f" Remaining blocks: {game.blocks_left[0]}"
+        text_right_1 = f"Distance to endline: {game.check_dist(1, 0)} "
+        text_right_2 = f"Remaining blocks: {game.blocks_left[1]} "
         
         text_left_1_renderd = font.render(text_left_1, 1, Board.PLAYER1_COLOR)
         text_left_2_renderd = font.render(text_left_2, 1, Board.PLAYER1_COLOR)
