@@ -16,22 +16,17 @@ class Client:
 
     def connect_to_game(self):
         self.network.connect()
-
         if not self.network.possible_to_connect:
             return # Server is unavailable
 
         self.network.send_text(self.client_id)
-
         info_dict = self.network.recv_json()
-
         if type(info_dict) != dict:
             return # Wrong info received
         
         if self.client_id == "null":
             self.client_id = info_dict["id"]
-
         self.player_number = info_dict["player"]
-
 
         if self.player_number != -1:
             print(f"Welcome client '{self.client_id}' You are player {self.player_number}")
@@ -81,29 +76,24 @@ class Client:
                 print("Reconnecting...")
                 self.connect_to_game()
                 time.sleep(0.5)
-
             if not self.network.possible_to_connect:
                 break # Connetion is impossible
 
             self.game = self.network.recv_game()
-
             if type(self.game) != Game: 
                 self.connected_to_game = False
                 continue # Need to reconnect
 
             self.show_board()
-
             if self.game.ended:
                 self.end_game(self.game, self.board)
                 break # Game ended
 
             move_type, move = self.check_pygame_events()
-
             if move_type == "quit":
                 break # Player quit
             
             self.network.send_move(move_type, move)
-
 
         print("[QUITTING]")
         pygame.quit()
