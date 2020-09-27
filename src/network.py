@@ -9,6 +9,7 @@ class Network:
     def __init__(self, server, port):
         self.server_addr = server, port
         self.possible_to_connect = True
+        self.socket = None
 
     def connect(self):
         try:
