@@ -1,6 +1,6 @@
 import pygame
 import math
-from game import Game
+from game.game import Game
 from button import Button
 from pygame import gfxdraw
 

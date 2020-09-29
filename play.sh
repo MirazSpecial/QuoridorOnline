@@ -7,4 +7,4 @@ ADDRESS="192.168.0.59"
 PORT=5555
 
 
-python3 src/play.py $ADDRESS $PORT
+python3 client/play.py $ADDRESS $PORT

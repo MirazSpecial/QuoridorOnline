@@ -2,10 +2,11 @@ import socket
 import threading
 import sys
 import json
-from game import Game
-from arena import Arena
 import pickle
 import time
+import commands
+from game.game import Game
+from arena import Arena
 
 FORMAT = "utf-8"
 DATA_RECV_SIZE = 64
@@ -15,7 +16,7 @@ def performe_move(game, player, data):
     try:
         move_dict = json.loads(data)
     except json.decoder.JSONDecodeError as e:
-        print(f"[ERROR] Corrupted json: {data}")
+        print(f"[SERVER] Error: corrupted json: {data}")
         return
 
     pos = tuple(move_dict["pos"])
@@ -23,24 +24,24 @@ def performe_move(game, player, data):
 
     if move_id == "move":
         if game.move_if_possible(player, pos):
-            print(f"Move by {player} was succesful")
+            print(f"[SERVER] Move by {player} was succesful")
         else:
-            print(f"Move by {player} was not succesful")
+            print(f"[SERVER] Move by {player} was not succesful")
     elif move_id in ("vert", "horiz"):
         if game.place_block(player, move_id, pos):
-            print(f"Blocking by {player} was succesful")
+            print(f"[SERVER] Blocking by {player} was succesful")
         else:
-            print(f"Blocking by {player} was not succesful")
+            print(f"[SERVER] Blocking by {player} was not succesful")
     elif move_id == "undo":
         if game.move % 2 != player and len(game.moves) != 0:
             game.undo_move()
-            print(f"Player {player} succesfully undo'd")
+            print(f"[SERVER] Player {player} succesfully undo'd")
         else:
-            print(f"Player {player} failed to undo")
+            print(f"[SERVER] Player {player} failed to undo")
 
 
 def renew_arena(arena):
-    print("New arena")
+    print("[SERVER] Renewing arena")
     arena.new_game()
     arena.clients = []
 
@@ -61,7 +62,7 @@ def handle_game(connection, arena, player):
                 arena.game.winner = player
                 arena.game.ended = True
         except:
-            print(f"[ERROR] Error: {sys.exc_info()[0]}")
+            print(f"[SERVER] Error: {sys.exc_info()[0]}")
             break
 
 
@@ -70,12 +71,12 @@ def handle_connection(connection, arena, new_id):
     client_dict = {}
 
     if not client_id:
-        print("Connection not established")
+        print("[SERVER] Connection not established")
         return
 
     client_id = client_id.rstrip()
     if client_id == "null":
-        print(f"Setting new id: {new_id}")
+        print(f"[SERVER] Setting new id: {new_id}")
         client_dict["id"] = str(new_id)
         client_id = str(new_id)
 
@@ -92,38 +93,48 @@ def handle_connection(connection, arena, new_id):
     client_dict += " " * (JSON_SEND_SIZE - len(client_dict))
     connection.send(client_dict.encode(FORMAT))
 
-    print(f"Arena clients: {len(arena.clients)}")
+    print(f"[SERVER] Arena clients: {len(arena.clients)}")
     handle_game(connection, arena, player)
         
-    print("Connection ended")
+    print("[SERVER] Connection ended")
     #arena.quit_arena(client_id)
     connection.close()
     
 
 def bind(s, server_address):
     try:
-        print("[BINDING]")
+        print("[SERVER] Binding...")
         s.bind(server_address)
-        print("[SERVER STARTED]")
+        print("[SERVER] Server start")
     except socket.error as e:
         str(e)
 
 
 def main():
     server_address = sys.argv[1], int(sys.argv[2])
+    path_to_db = sys.argv[3]
 
+    # Create and bind socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     bind(s, server_address)
     s.listen()
     
+    # Create game room
     arena = Arena()
     new_id = 1000 # id for first joining player
 
+    # Start listening for commandscd
+    thread = threading.Thread(target=commands.listen_for_commands,
+                              args=(arena, path_to_db))
+    thread.start()
+
+    # Start accepting connections
     while True:
         conn, addr = s.accept()
-        print(f"[CONNECTED] Connected to: {addr}")
+        print(f"[SERVER] Connected to: {addr}")
         
-        thread = threading.Thread(target=handle_connection, args=(conn, arena, new_id))
+        thread = threading.Thread(target=handle_connection, 
+                                  args=(conn, arena, new_id))
         thread.start()
 
         new_id += 1

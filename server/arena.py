@@ -1,4 +1,4 @@
-from game import Game
+from game.game import Game
 
 class Arena:
     MAX_PLAYERS = 2 # Maybe 4 one day too.

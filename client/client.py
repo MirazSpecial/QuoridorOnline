@@ -1,4 +1,4 @@
-from game import Game
+from game.game import Game
 from network import Network
 from board import Board
 import pygame

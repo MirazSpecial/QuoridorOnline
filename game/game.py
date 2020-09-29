@@ -1,4 +1,4 @@
-import queue
+import queue, json, copy
 
 class Game:
     def __init__(self, width = 9, height = 9, blocks1 = 10, blocks2 = 10):
@@ -160,8 +160,11 @@ class Game:
 
     
     def undo_move(self):
-        if len(self.moves) == 0:
-            return
+        """ Removes last made move and returns information if 
+        removing was succesfull."""
+
+        if self.move == 0:
+            return False
         
         last_move = self.moves[-1]
         self.moves.pop()
@@ -172,8 +175,7 @@ class Game:
         elif last_move["id"] in ("vert", "horiz"):
             self.blocks[tuple(last_move["pos"])] = "null"
             self.blocks_left[self.move % 2] += 1
-        
-
+        return True
 
     def check_winner(self, player):
         if player == 0 and self.players_pos[player][1] == self.height - 1:
@@ -181,3 +183,18 @@ class Game:
         elif player == 1 and self.players_pos[player][1] == 0:
             return True
         return False
+
+
+    def json_description(self):
+        desc = {}
+        desc['pos1'] = self.players_pos[0]
+        desc['pos2'] = self.players_pos[1]
+        desc['blocks_left1'] = self.blocks_left[0]
+        desc['blocks_left2'] = self.blocks_left[1]
+        desc['move'] = self. move
+        desc['blocks'] = copy.deepcopy(self.blocks)
+
+        # desc['blocks] keys need to be changed from tuple
+        desc['blocks'] = dict((str(k), v) for k, v in desc['blocks'].items())
+
+        return json.dumps(desc)
