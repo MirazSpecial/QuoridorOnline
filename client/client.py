@@ -12,6 +12,7 @@ class Client:
         self.client_id = "null"
         self.connected_to_game = False
         self.board = Board()
+        self.player_number = None
 
 
     def connect_to_game(self):
