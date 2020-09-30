@@ -23,7 +23,7 @@ def listen_for_commands(arena, path_to_db):
         elif command == 'check':
             stats.show_game_stats(conn, c, arena.game)
         elif command == 'reset_stats':
-            print("[STATS] Do You really want to reset ALL stats (options: yes, no): ", end='')
+            print('[STATS] Do You really want to reset ALL stats (options: yes, no): ', end='')
             decision = input()
             if decision == 'yes':
                 data.delete_table(conn, c)
@@ -32,8 +32,14 @@ def listen_for_commands(arena, path_to_db):
                 print('[STATS] Operation aborted')
         elif command == 'exit':
             break
+        elif command == 'help':
+            print('[STATS] Possible commends are:')
+            print('[STATS] add - ads current position (and all the position that led to it) to database')
+            print('[STATS] check - checks this position statistics in database')
+            print('[STATS] reset_stats - resets all of the statistics')
+            print('[STATS] exit - disables stats commands for this game')
         else:
-            print("[STATS] Wrong command")
+            print('[STATS] Wrong command')
 
     data.close_connection(conn)
-    print("[STATS] Thread closing")
+    print('[STATS] Thread closing')
