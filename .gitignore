@@ -3,3 +3,7 @@ __pycache__/
 
 # Databases
 *.db
+
+# VSCode files
+.vscode/
+.run_server.sh.swp
